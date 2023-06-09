@@ -1,58 +1,65 @@
 package vistas;
 
+import vistas.Ventana;
+import controladores.ControladorVentas;
 import exceptions.CamposVaciosException;
-import DB.Venta;
+import controladores.LecturaEscritura;
+import modelos.ModeloTablaVentas;
 import controladores.LeerEscribirObjectStreams;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.BasicStroke;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import DB.Venta;
+import javax.swing.border.AbstractBorder;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTable;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
 
-public class FormularioParaPecesEditar extends JPanel implements ActionListener {
+public class FormularioParaAdmins extends JPanel implements ActionListener {
 
+	JTextField campoNombre;
+	JPasswordField campoContrasena;
 	JTextField[] campos;
 	JPanel panelInputs = new JPanel(new SpringLayout());
 	JPanel panelBotones = new JPanel();
+	JPanel patoPez = new JPanel();
 	LeerEscribirObjectStreams guardar = new LeerEscribirObjectStreams();
-	Venta ventita;
-	JTable tablaventas;
-	int seleccion;
+	String nombre;
+	String contrasena;
 
-	public FormularioParaPecesEditar(JTable tabla) {
-		this.tablaventas = tabla;
-
-		seleccion = tabla.getSelectedRow();
-		System.out.println(seleccion);
-
+	public FormularioParaAdmins() {
 		panelBotones.setLayout(new FlowLayout(FlowLayout.LEFT));
+		patoPez.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		setLayout(new BorderLayout());
 		setBackground(Color.WHITE);
 
-		String etiquetas[] = { "Nombre", "Especie", "Edad", "Razon de visita" };
+		String etiquetas[] = { "Nombre", "Contrasena" };
 		campos = new JTextField[etiquetas.length];
 		Font fuenteFormulario = new Font("Poppins", Font.PLAIN, 16);
-
 		for (int i = 0; i < etiquetas.length; i++) {
 
 			panelInputs.setBackground(Color.white);
@@ -66,15 +73,12 @@ public class FormularioParaPecesEditar extends JPanel implements ActionListener 
 
 			campos[i].setName(etiquetas[i]);
 			panelInputs.add(new JLabel(etiquetas[i]));
-
-			campos[i].setText("" + tablaventas.getValueAt(seleccion, i));
-
 			panelInputs.add(campos[i]);
 		}
 
-		SpringUtilities.makeCompactGrid(panelInputs, 4, 2, 10, 10, 10, 10);
+		SpringUtilities.makeCompactGrid(panelInputs, 2, 2, 10, 50, 10, 50);
 
-		JLabel titulo = new JLabel("�Qui�n nos visita el d�a de hoy?");
+		JLabel titulo = new JLabel("Bienvenido, administrador");
 		titulo.setFont(new Font("Poppins", Font.BOLD, 30));
 		titulo.setForeground(Color.decode("#038aff"));
 
@@ -85,8 +89,11 @@ public class FormularioParaPecesEditar extends JPanel implements ActionListener 
 
 		Imagenes imagenPez = new Imagenes(250, 250);
 		imagenPez.settearImagen(imagenRandom());
+		
+		Imagenes imagenIcon = new Imagenes(35, 35);
+		imagenIcon.settearImagen("fishIcon.png");
 
-		JButton guardar = new JButton("Guardar");
+		JButton guardar = new JButton("Iniciar sesion");
 		JButton cancelar = new JButton("Cancelar");
 
 		guardar.setBorder(
@@ -105,6 +112,7 @@ public class FormularioParaPecesEditar extends JPanel implements ActionListener 
 
 		box1.add(Box.createHorizontalStrut(25));
 		box2.add(rigidArea);
+		box2.add(imagenIcon);
 		box2.add(titulo);
 		panelBotones.add(Box.createRigidArea(new Dimension(15, 50)));
 		add(imagenPez, BorderLayout.EAST);
@@ -116,36 +124,33 @@ public class FormularioParaPecesEditar extends JPanel implements ActionListener 
 		panelBotones.add(guardar);
 		guardar.addActionListener(this);
 		add(panelBotones, BorderLayout.SOUTH);
-		
-		Venta.eliminar(seleccion+1);
-		
-		
+
 	}
 
 	public void actionPerformed(ActionEvent e) {
 
 		if (e.getActionCommand().equals("Cancelar")) {
 			SwingUtilities.windowForComponent((JButton) e.getSource()).dispose();
-		} else if (e.getActionCommand().equals("Guardar")) {
-			// contador++;
-			//ArrayList<Venta> datos = new ArrayList<>();
+		} else if (e.getActionCommand().equals("Iniciar sesion")) {
 
-			for (JTextField campo : campos) {
-				try {
-					validarCampo(campo.getText(), campo.getName());
-				} catch (CamposVaciosException e1) {
-					JOptionPane.showMessageDialog(this, e1.getMessage());
-					return;
-				}
+			/*try {
+				validarCampo(nombre, "Nombre");
+				validarCampo(contraseña, "Contraseña");
+			} catch (CamposVaciosException e1) {
+				JOptionPane.showMessageDialog(this, e1.getMessage());
+				return;
+			}*/
+			nombre= campos[0].getText();
+			contrasena= campos[1].getText();
+			if (Venta.verificarUsuario(nombre, contrasena)) {
+				
+				VistaVentas panelTabla = new VistaVentas();
+				Ventana ventana = new Ventana(panelTabla);
+				SwingUtilities.windowForComponent((JButton) e.getSource()).dispose();
+			}else {
+				JOptionPane.showMessageDialog((JButton) e.getSource(), "Contrasena o Usario incorrectos");
 			}
 
-			Venta nuevaVenta = new Venta();
-			nuevaVenta.setNombre(campos[0].getText());
-			nuevaVenta.setEspecie(campos[1].getText());
-			nuevaVenta.setEdad(Integer.parseInt(campos[2].getText()));
-			nuevaVenta.setRazon(campos[3].getText());
-			Venta.insertarVenta(nuevaVenta);
-			SwingUtilities.windowForComponent((JButton) e.getSource()).dispose();
 
 		}
 
@@ -155,10 +160,13 @@ public class FormularioParaPecesEditar extends JPanel implements ActionListener 
 		if (cadena.isEmpty()) {
 			throw new CamposVaciosException(campo);
 		}
+
 	}
 
 	public String imagenRandom() {
 		String[] imagenes = { "azulcropped.png", "globocropped.png", "pezclowncroped.png" };
-		return imagenes[(int) (Math.random() * imagenes.length)];
+
+		return imagenes[(int) (Math.random() * imagenes.length) + 0];
 	}
+
 }
