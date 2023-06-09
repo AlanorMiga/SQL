@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
-public class AppendObjectOutputStream extends ObjectOutputStream{
+public class AppendObjectOutputStream extends ObjectOutputStream {
 
 	public AppendObjectOutputStream(OutputStream out) throws IOException {
 		super(out);
@@ -12,7 +12,6 @@ public class AppendObjectOutputStream extends ObjectOutputStream{
 
 	@Override
 	protected void writeStreamHeader() throws IOException {
-		// TODO Auto-generated method stub
 		reset();
 	}
 }

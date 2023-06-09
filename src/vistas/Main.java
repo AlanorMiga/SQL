@@ -1,30 +1,17 @@
 package vistas;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import DB.*;
 
-
 public class Main {
 
-	
-	
 	public static void main(String[] args) {
 
-		VistaVentas panelTabla = new VistaVentas();
-		Ventana ventana = new Ventana(panelTabla);
-		
-		//System.out.println(Venta.verVenta(1));
-		
-		// FormularioParaPeces formularioParaPeces= new FormularioParaPeces();
-		// Ventana ventanaForum= new Ventana(formularioParaPeces);
-		
+		FormularioParaAdmins panelAdmin = new FormularioParaAdmins();
+		Ventana ventana = new Ventana(panelAdmin);
+		ventana.setResizable(false);
 
-		
-
-		
-//		AgregarCompra ventanaForum = new AgregarCompra();
-
-	
 	}
 
 }
