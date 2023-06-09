@@ -19,24 +19,23 @@ import modelos.Venta;
 public class LecturaEscritura {
 
 	ModeloTablaVentas modeloVentas;
-	
+
 	public LecturaEscritura(ModeloTablaVentas modeloVentas) {
 		this.modeloVentas = modeloVentas;
 	}
-	
+
 	public void cargarDatos() throws IOException {
 		ObjectInputStream leer = null;
-		
+
 		try {
-			leer = new ObjectInputStream(new BufferedInputStream(
-					new FileInputStream("C:/users/thinkpad/Downloads/MVCVentas/MVCVentas/src/archivos/datosCompra2.txt")));
-			
-			while(true) {
-				Venta venta = (Venta)leer.readObject();
+			leer = new ObjectInputStream(new BufferedInputStream(new FileInputStream("src/archivos/datosCompra2.txt")));
+
+			while (true) {
+				Venta venta = (Venta) leer.readObject();
 				modeloVentas.addRow(venta);
 			}
-		}catch(EOFException ex) {
-			
+		} catch (EOFException ex) {
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -45,46 +44,45 @@ public class LecturaEscritura {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-			if(leer != null) {
+			if (leer != null) {
 				leer.close();
 			}
 		}
 	}
-	
+
 	public void guardar() throws IOException {
 		ObjectOutputStream escribir = null;
-		
+
 		try {
-			escribir = new ObjectOutputStream(new BufferedOutputStream(
-					new FileOutputStream("C:/users/thinkpad/Downloads/MVCVentas/MVCVentas/src/archivos/datosCompra2.txt")));
-			
-			for(int fila = 0; fila < modeloVentas.getRowCount(); fila++) {
-				if(!validar(fila, 0) || !validar(fila, 1) || !validar(fila, 2)) {
+			escribir = new ObjectOutputStream(
+					new BufferedOutputStream(new FileOutputStream("src/archivos/datosCompra2.txt")));
+
+			for (int fila = 0; fila < modeloVentas.getRowCount(); fila++) {
+				if (!validar(fila, 0) || !validar(fila, 1) || !validar(fila, 2)) {
 					continue;
 				}
-				
+
 				escribir.writeObject(modeloVentas.getRow(fila));
 			}
-			
+
 			JOptionPane.showMessageDialog(null, "Se han guardado los datos");
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-			if(escribir != null) {
+			if (escribir != null) {
 				escribir.close();
 			}
 		}
 	}
-	
+
 	public boolean validar(int fila, int columna) {
-		if(modeloVentas.getValueAt(fila, columna) == null 
-				|| modeloVentas.getValueAt(fila, columna).equals("")) {
+		if (modeloVentas.getValueAt(fila, columna) == null || modeloVentas.getValueAt(fila, columna).equals("")) {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 }

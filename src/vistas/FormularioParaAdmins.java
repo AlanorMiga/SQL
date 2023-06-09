@@ -1,81 +1,84 @@
 package vistas;
 
+import vistas.Ventana;
+import controladores.ControladorVentas;
 import exceptions.CamposVaciosException;
+import controladores.LecturaEscritura;
+import modelos.ModeloTablaVentas;
 import modelos.Venta;
 import controladores.LeerEscribirObjectStreams;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.BasicStroke;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
+import javax.swing.border.AbstractBorder;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTable;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
 
-public class FormularioParaPecesEditar extends JPanel implements ActionListener {
+public class FormularioParaAdmins extends JPanel implements ActionListener {
 
-	JTextField[] campos;
+	JTextField campoNombre;
+	JPasswordField campoContrasena;
 	JPanel panelInputs = new JPanel(new SpringLayout());
 	JPanel panelBotones = new JPanel();
 	LeerEscribirObjectStreams guardar = new LeerEscribirObjectStreams();
-	Venta ventita;
-	JTable tablaventas;
-	int seleccion;
 
-	public FormularioParaPecesEditar(JTable tabla) {
-		this.tablaventas = tabla;
-
-		seleccion = tabla.getSelectedRow();
-		System.out.println(seleccion);
-
+	public FormularioParaAdmins() {
 		panelBotones.setLayout(new FlowLayout(FlowLayout.LEFT));
 		setLayout(new BorderLayout());
 		setBackground(Color.WHITE);
 
-		String etiquetas[] = { "Nombre", "Especie", "Edad", "Razon de visita" };
-		campos = new JTextField[etiquetas.length];
+		String etiquetas[] = { "Nombre", "Contrasena" }; // Etiquetas modificadas
+
 		Font fuenteFormulario = new Font("Poppins", Font.PLAIN, 16);
 
-		for (int i = 0; i < etiquetas.length; i++) {
+		panelInputs.setBackground(Color.white);
 
-			panelInputs.setBackground(Color.white);
+		campoNombre = new JTextField();
+		campoNombre.setFont(fuenteFormulario);
+		campoNombre.setBackground(Color.decode("#f2f2f2"));
+		campoNombre.setBorder(BorderFactory.createCompoundBorder(new CustomBorder(),
+				new EmptyBorder(new Insets(15, 25, 15, 25))));
+		campoNombre.setName(etiquetas[0]);
+		panelInputs.add(new JLabel(etiquetas[0]));
+		panelInputs.add(campoNombre);
 
-			campos[i] = new JTextField();
-			campos[i].setFont(fuenteFormulario);
-			campos[i].setBackground(Color.decode("#f2f2f2"));
+		campoContrasena = new JPasswordField();
+		campoContrasena.setFont(fuenteFormulario);
+		campoContrasena.setBackground(Color.decode("#f2f2f2"));
+		campoContrasena.setBorder(BorderFactory.createCompoundBorder(new CustomBorder(),
+				new EmptyBorder(new Insets(15, 25, 15, 25))));
+		campoContrasena.setName(etiquetas[1]);
+		panelInputs.add(new JLabel(etiquetas[1]));
+		panelInputs.add(campoContrasena);
 
-			campos[i].setBorder(BorderFactory.createCompoundBorder(new CustomBorder(),
-					new EmptyBorder(new Insets(15, 25, 15, 25))));
+		SpringUtilities.makeCompactGrid(panelInputs, 2, 2, 10, 10, 10, 10);
 
-			campos[i].setName(etiquetas[i]);
-			panelInputs.add(new JLabel(etiquetas[i]));
-
-			campos[i].setText("" + tablaventas.getValueAt(seleccion, i));
-
-			panelInputs.add(campos[i]);
-		}
-
-		SpringUtilities.makeCompactGrid(panelInputs, 4, 2, 10, 10, 10, 10);
-
-		JLabel titulo = new JLabel("¿Quién nos visita el día de hoy?");
+		JLabel titulo = new JLabel("Bienvenido, administrador");
 		titulo.setFont(new Font("Poppins", Font.BOLD, 30));
 		titulo.setForeground(Color.decode("#038aff"));
 
@@ -117,6 +120,7 @@ public class FormularioParaPecesEditar extends JPanel implements ActionListener 
 		panelBotones.add(guardar);
 		guardar.addActionListener(this);
 		add(panelBotones, BorderLayout.SOUTH);
+
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -124,31 +128,19 @@ public class FormularioParaPecesEditar extends JPanel implements ActionListener 
 		if (e.getActionCommand().equals("Cancelar")) {
 			SwingUtilities.windowForComponent((JButton) e.getSource()).dispose();
 		} else if (e.getActionCommand().equals("Guardar")) {
-			// contador++;
-			ArrayList<Venta> datos = new ArrayList<>();
+			String nombre = campoNombre.getText();
+			String contraseña = new String(campoContrasena.getPassword());
 
-			for (JTextField campo : campos) {
-				try {
-					validarCampo(campo.getText(), campo.getName());
-				} catch (CamposVaciosException e1) {
-					JOptionPane.showMessageDialog(this, e1.getMessage());
-					return;
-				}
-			}
-
-			Venta nuevaVenta = new Venta();
-			nuevaVenta.setNombre(campos[0].getText());
-			nuevaVenta.setEspecie(campos[1].getText());
-			nuevaVenta.setEdad(Integer.parseInt(campos[2].getText()));
-			nuevaVenta.setRazon(campos[3].getText());
 			try {
-				guardar.escribirDatos(nuevaVenta,
-						"src/archivos/datosCompra2.txt");
-				JOptionPane.showMessageDialog(this, "Se ha guardado la compra.");
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				validarCampo(nombre, "Nombre");
+				validarCampo(contraseña, "Contraseña");
+			} catch (CamposVaciosException e1) {
+				JOptionPane.showMessageDialog(this, e1.getMessage());
+				return;
 			}
+
+			// Resto del código para guardar la información
+
 			SwingUtilities.windowForComponent((JButton) e.getSource()).dispose();
 
 		}
@@ -159,10 +151,13 @@ public class FormularioParaPecesEditar extends JPanel implements ActionListener 
 		if (cadena.isEmpty()) {
 			throw new CamposVaciosException(campo);
 		}
+
 	}
 
 	public String imagenRandom() {
 		String[] imagenes = { "azulcropped.png", "globocropped.png", "pezclowncroped.png" };
-		return imagenes[(int) (Math.random() * imagenes.length)];
+
+		return imagenes[(int) (Math.random() * imagenes.length) + 0];
 	}
+
 }

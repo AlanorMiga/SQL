@@ -12,22 +12,23 @@ public class MySQLConnection {
 	private static String port = "3306";
 	private static String username = "root";
 	private static String password = "";
-	
-	private static String url = "jdbc:mysql://" + hostname + ":" + port + "/" + database + "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+
+	private static String url = "jdbc:mysql://" + hostname + ":" + port + "/" + database
+			+ "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 
 	public static Connection connect() {
-		
+
 		Connection conn = null;
-		
+
 		try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, username, password);
-		}catch(SQLException | ClassNotFoundException ex) {
+		} catch (SQLException | ClassNotFoundException ex) {
 			ex.printStackTrace();
 		}
-		
+
 		return conn;
-		
+
 	}
-	
+
 }
